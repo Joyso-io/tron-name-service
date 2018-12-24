@@ -1,0 +1,184 @@
+.register {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    .message {
+        height: 70px;
+        border: 2px solid #000;
+        background-color: #fff539;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px 20px;
+    
+        img {
+            width: 40px;
+            height: 40px;
+            margin-right: 14px;
+        }
+    }
+
+    .message.owner {
+        background-color: #fff;
+    }
+
+    .wallet {
+        width: 700px;
+        background-color: #fff539;
+        display: flex;
+        padding: 12px 33px;
+        margin-top: 35px;
+        align-items: center;
+
+        img {
+            margin-right: 30px;
+        }
+
+        .text {
+            width: 100%;
+        }
+
+        .col-8 {
+            padding-left: 0;
+            margin-left: -20px;
+        }
+
+        .fa-share {
+            cursor: pointer;
+            margin-left: 5px;
+        }
+    }
+
+    .cooldown {
+        width: 700px;
+        margin-top: 30px;
+        padding: 20px;
+        border: 1px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+        div {
+            margin: 5px;
+        }
+
+        .fa-clock {
+            margin-right: 10px;
+        }
+
+        .fix-time {
+            font-size: 22px;
+            font-weight: bold;
+        }
+    }
+
+    .form {
+        width: 700px;
+        background-color: #efefef;
+        margin-top: 20px;
+        padding: 17px 50px;
+
+        .form-group {
+            position: relative;
+            margin-bottom: 30px;
+
+            .form-control {
+                height: 30px;
+                border: 1px solid #000000;
+            }
+
+            .append-text {
+                position: absolute;
+                font-size: 18px;
+                right: -35px;
+                top: 33px;
+            }
+
+            .big {
+                right: -40px;
+            }
+        }
+
+        .reg {
+            margin: 0 auto 30px auto;
+        }
+
+        .col-4 {
+            margin-bottom: 10px;
+        }
+    }
+
+    .buttons {
+        width: 100%;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .button {
+        margin: 10px 30px;
+    }
+
+    .modal-container {
+        padding: 30px 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+        .modal-title {
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+    
+        .modal-title::after {
+            height: 15px;
+            width: 100%;
+            background-color: #fff539;
+            content: "";
+            position: absolute;
+            top: 5px;
+            right: 0;
+            z-index: -1;
+            transform: skew(-20deg);
+        }
+
+        img {
+            margin-top: 20px;
+        }
+
+        .data {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .col-4 {
+            margin-bottom: 10px;
+        }
+
+        .buttons {
+            width: 100%;
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+
+    .cancel {
+        background-color: #fff;
+        border: 1px solid #000;
+        width: 120px;
+    }
+
+    .confirm {
+        width: 120px;
+    }
+}
+
+.modal-dialog {
+    max-width: 600px;
+}

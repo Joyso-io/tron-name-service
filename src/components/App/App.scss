@@ -1,0 +1,105 @@
+$red: #c23631;
+$yellow: #fff539;
+$black: #0b132b;
+$gray: #E7E7E7;
+
+.container {
+    margin-top: 70px;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: $black;
+}
+
+.name {
+    font-weight: bold;
+    position: relative;
+}
+
+.name::after {
+    height: 15px;
+    width: 100%;
+    background-color: $yellow;
+    content: "";
+    position: absolute;
+    top: 5px;
+    right: 0;
+    z-index: -1;
+    transform: skew(-20deg);
+}
+
+.address {
+    color: $red;
+    position: relative;
+}
+
+.address::after {
+    height: 15px;
+    width: 100%;
+    background-color: $gray;
+    content: "";
+    position: absolute;
+    top: 5px;
+    right: 0;
+    z-index: -1;
+    transform: skew(-20deg);
+}
+
+.intro {
+    width: 750px;
+    font-size: 14px;
+    margin-top: 50px;
+}
+
+.search {
+    margin-top: 50px;
+
+    .input-group {
+        width: 400px;
+        height: 30px;
+        border: 1px solid #000000;
+
+        input {
+            height: 28px;
+        }
+    }
+
+    .form-control {
+        border-right: 1px solid #000000;
+    }
+
+    .input-group-text {
+        width: 75px;
+        background-color: $yellow;
+        justify-content: center;
+        color: $black;
+    }
+}
+
+.button {
+    width: 170px;
+    height: 30px;
+    border-radius: 15px;
+    background-color: $yellow;
+    text-align: center;
+    line-height: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.button[disabled] {
+    cursor: no-drop;
+}
+
+.button:hover {
+    filter: brightness(0.9);
+}
+
+.check {
+    margin-top: 30px;
+}

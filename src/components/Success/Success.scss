@@ -1,0 +1,32 @@
+.success {
+    display: flex;
+    align-items: center;
+    padding: 40px 45px 0 45px;
+
+    img {
+        width: 87px;
+        height: 70px;
+    }
+
+    .text-contain {
+        margin-left: 30px;
+        height: 75px;
+
+        .text-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .text-content {
+            font-size: 14px;
+            margin-top: 15px;
+        }
+    }
+}
+
+.button-contain {
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

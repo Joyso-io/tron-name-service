@@ -1,0 +1,35 @@
+.no-wallet {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 600px;
+    padding: 30px 40px;
+
+    .no-wallet-content {
+        margin: 20px 0;
+    }
+
+    .link {
+        margin-bottom: 0;
+
+        a {
+            position: relative;
+            z-index: 2;
+            color: #000;
+        }
+
+        a::after {
+            height: 15px;
+            width: 100%;
+            background-color: #fff539;
+            content: "";
+            position: absolute;
+            top: 5px;
+            right: 0;
+            z-index: -1;
+            transform: skew(-20deg);
+        }
+    }
+}
