@@ -36,6 +36,11 @@ contract TronNameService is Ownable {
         _;
     }
 
+    modifier enoughToPay() {
+        require(msg.value > sunPerMinute);
+        _;
+    }
+
     constructor() public {
         payoutAddress = msg.sender;
     }
@@ -60,19 +65,13 @@ contract TronNameService is Ownable {
         address(payoutAddress).transfer(address(this).balance);
     }
 
-    function register(string name) external payable onlyExpired(name) {
-        records[name].owner = msg.sender;
-        records[name].target = msg.sender;
-        records[name].expiredAt = uint96(now + (msg.value / sunPerMinute) * 60);
-    }
-
-    function register(string name, address target) external payable onlyExpired(name) {
+    function register(string name, address target) external payable enoughToPay onlyExpired(name) {
         records[name].owner = msg.sender;
         records[name].target = target;
         records[name].expiredAt = uint96(now + (msg.value / sunPerMinute) * 60);
     }
 
-    function extend(string name) external payable onlyRecordOwner(name) {
+    function extend(string name) external payable enoughToPay onlyRecordOwner(name) {
         records[name].expiredAt = uint96(now + (msg.value / sunPerMinute) * 60);
     }
 
