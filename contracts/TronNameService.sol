@@ -14,7 +14,7 @@ contract TronNameService is Ownable {
     uint256 public sunPerMinute = 694; // 694 sun for 1 minute
     uint256 public fee = 100; // 1%
     mapping (address => bool) public isAdmin;
-    mapping (string => Record) public records;
+    mapping (string => Record) records;
 
     modifier onlyAdmin {
         require(msg.sender == owner || isAdmin[msg.sender]);
@@ -97,5 +97,9 @@ contract TronNameService is Ownable {
 
     function expired(string name) public view returns (bool) {
         return records[name].owner == address(0) || now > records[name].expiredAt;
+    }
+
+    function getRecord(string name) public view returns (address, address, uint96, uint256) {
+        return (records[name].owner, records[name].target, records[name].expiredAt, records[name].price);
     }
 }
