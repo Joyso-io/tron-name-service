@@ -1,89 +1,101 @@
 pragma solidity ^0.4.23;
 
-contract TronNameService
-{
-    uint defaultPrice = 1;
-    uint incrementRate = 30;
-    uint cooldownTime = 1 days;
-    address admin;
+import "../node_modules/zeppelin-solidity/contracts/ownership/Ownable.sol";
 
+contract TronNameService is Ownable {
     struct Record {
         address owner;
-        uint price;
-        uint cooldown;
+        address target;
+        uint96 expiredAt;
+        uint256 price;
     }
 
-    struct User {
-        uint pendingWithdraw;
+    address public payoutAddress;
+    uint256 public sunPerMinute = 694; // 694 sun for 1 minute
+    uint256 public fee = 100; // 1%
+    mapping (address => bool) public isAdmin;
+    mapping (string => Record) public records;
+
+    modifier onlyAdmin {
+        require(msg.sender == owner || isAdmin[msg.sender]);
+        _;
     }
 
-    mapping (string => Record) records;
-    mapping (address => User) users;
+    modifier onlyExpired(string name) {
+        require(expired(name));
+        _;
+    }
+
+    modifier onlyRecordOwner(string name) {
+        require(!expired(name) && records[name].owner == msg.sender);
+        _;
+    }
+
+    modifier onlyRecordOnSale(string name) {
+        require(!expired(name) && records[name].price > 0);
+        _;
+    }
 
     constructor() public {
-        admin = msg.sender;
+        payoutAddress = msg.sender;
     }
 
-    function setAddress(string name) public payable {
-        uint increase;
-        uint price;
+    function addToAdmin(address admin, bool isAdd) external onlyOwner {
+        isAdmin[admin] = isAdd;
+    }
 
-        require(records[name].cooldown <= now);
+    function setPayoutAddress(address newPayoutAddress) external onlyOwner {
+        payoutAddress = newPayoutAddress;
+    }
 
-        if (records[name].owner == address(0)) {
-            require(msg.value >= 1000000);
-            users[admin].pendingWithdraw = SafeMath.add(users[admin].pendingWithdraw, msg.value);
-            records[name].owner = msg.sender;
-            records[name].price = msg.value;
-            records[name].cooldown = uint(now + cooldownTime);
-        } else {
-            increase = SafeMath.div(SafeMath.mul(records[name].price, incrementRate), 100);
-            price = SafeMath.add(records[name].price, increase);
-            require(msg.value >= price);
-            users[admin].pendingWithdraw = SafeMath.add(users[admin].pendingWithdraw, msg.value);
-            records[name].owner = msg.sender;
-            records[name].price = msg.value;
-            records[name].cooldown = uint(now + cooldownTime);
+    function setPrice(uint256 price) external onlyAdmin {
+        sunPerMinute = price;
+    }
+
+    function setFee(uint256 newFee) external onlyAdmin {
+        fee = newFee;
+    }
+
+    function withdraw() external onlyAdmin {
+        address(payoutAddress).transfer(address(this).balance);
+    }
+
+    function register(string name) external payable onlyExpired(name) {
+        records[name].owner = msg.sender;
+        records[name].target = msg.sender;
+        records[name].expiredAt = uint96(now + (msg.value / sunPerMinute) * 60);
+    }
+
+    function register(string name, address target) external payable onlyExpired(name) {
+        records[name].owner = msg.sender;
+        records[name].target = target;
+        records[name].expiredAt = uint96(now + (msg.value / sunPerMinute) * 60);
+    }
+
+    function extend(string name) external payable onlyRecordOwner(name) {
+        records[name].expiredAt = uint96(now + (msg.value / sunPerMinute) * 60);
+    }
+
+    function setTarget(string name, address target) external payable onlyRecordOwner(name) {
+        records[name].target = target;
+    }
+
+    function sell(string name, uint256 price) external onlyRecordOwner(name) {
+        records[name].price = price;
+    }
+
+    function buy(string name) external payable onlyRecordOnSale(name) {
+        uint256 price = records[name].price;
+        require(msg.value >= price);
+        uint256 afterFee = price * fee / 10000;
+        address(records[name].owner).transfer(afterFee);
+        if (msg.value > price) {
+            msg.sender.transfer(msg.value - price);
         }
+        records[name].owner = msg.sender;
     }
 
-    function getRecord(string name) public view returns (address, uint, uint) {
-        return (records[name].owner, records[name].price, records[name].cooldown);
-    }
-
-    function checkPendingWithdraw() public view returns (uint) {
-        return users[msg.sender].pendingWithdraw;
-    }
-
-    function withdraw() public {
-        if (users[msg.sender].pendingWithdraw > 0) {
-            uint amount = users[msg.sender].pendingWithdraw;
-            users[msg.sender].pendingWithdraw = 0;
-            msg.sender.transfer(amount);
-        }
-    }
-}
-
-library SafeMath {
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a * b;
-        assert(a == 0 || c / a == b);
-        return c;
-    }
-
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a / b;
-        return c;
-    }
-
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        assert(b <= a);
-        return a - b;
-    }
-
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
-        assert(c >= a);
-        return c;
+    function expired(string name) public view returns (bool) {
+        return records[name].owner == address(0) || now > records[name].expiredAt;
     }
 }
