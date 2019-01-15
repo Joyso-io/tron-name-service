@@ -131,7 +131,7 @@ class App extends React.Component {
     const input = this.state.input.toLowerCase();
     const result = await Utils.getRecord(input);
     let addressUsed, owner, target, expired, price;
-    console.log(result);
+
     if (result[1] === "410000000000000000000000000000000000000000") {
       addressUsed = false;
       owner = '';

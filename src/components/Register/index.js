@@ -35,8 +35,6 @@ class Register extends React.Component {
     this.untilDate = this.untilDate.bind(this);
     this.buy = this.buy.bind(this);
 
-    console.log(moment().unix(), this.props.data.expired);
-
     this.state = {
       modalShow: false,
       modalShowNoWallet: false,
