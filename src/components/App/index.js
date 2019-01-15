@@ -176,7 +176,7 @@ class App extends React.Component {
                 </div>
                 <div className="search">
                   <div className="input-group">
-                    <input type="text" className="form-control" placeholder="justin.trx" onChange={this.handleChange} />
+                    <input type="text" className="form-control" placeholder="justin" onChange={this.handleChange} />
                     <div className="input-group-append">
                       <span className="input-group-text">.trx</span>
                     </div>
