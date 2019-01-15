@@ -12,4 +12,4 @@ Tron Name Service is a naming service that simpify long, complicated wallet addr
 
 ## Contract Address
 
-TMf2gzpxpnePxv5ZKyxPQu2r2vkuVrk2kT
+TTQg1UwfKZpNRm4v8C2zBNf5715d5KSn5G
