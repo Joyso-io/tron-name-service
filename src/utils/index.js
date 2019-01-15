@@ -1,4 +1,4 @@
-const contractAddress = 'TMf2gzpxpnePxv5ZKyxPQu2r2vkuVrk2kT';
+const contractAddress = 'TRSpDuS5sQrqmUGsobpcZx4SJP8uw7CD19';
 
 const utils = {
     tronWeb: false,
@@ -24,8 +24,12 @@ const utils = {
         return this.contract.setAddress(name).send();
     },
 
-    async checkPendingWithdraw() {
-        return this.contract.checkPendingWithdraw().call();
+    async setTarget(name, target) {
+        return this.contract.setTarget(name, target).send();
+    },
+
+    async sell(name, price) {
+        return this.contract.sell(name, price).send();
     },
 
     async withdraw() {

@@ -7,7 +7,6 @@ import classNames from 'classnames';
 
 import './Register.scss';
 import tick from './tick.png';
-import wallet from './wallet.png';
 import bid from './bid.png';
 import owner from './owner.png';
 import owned from './owned.svg';
@@ -28,26 +27,11 @@ class Register extends React.Component {
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.back = this.back.bind(this);
-    this.withdraw = this.withdraw.bind(this);
-    this.countDown = this.countDown.bind(this);
     this.messageBlock = this.messageBlock.bind(this);
-    this.caculateTimestamp = this.caculateTimestamp.bind(this);
-
-    this.interval = setInterval(() => {
-      if (this.state.cooldown > 0) {
-        this.setState({
-          cooldown: this.state.cooldown - 1
-        })
-      }
-    }, 1000);
-
-    let cooldown;
-    if (this.props.data.cooldown === 0) {
-      cooldown = 0;
-    } else {
-      const timestamp = moment.unix(this.props.data.cooldown);
-      cooldown = Math.floor(timestamp.diff(moment().valueOf()) / 1000);
-    }
+    this.targetChange = this.targetChange.bind(this);
+    this.setTarget = this.setTarget.bind(this);
+    this.sellPriceChange = this.sellPriceChange.bind(this);
+    this.sell = this.sell.bind(this);
 
     this.state = {
       modalShow: false,
@@ -56,39 +40,33 @@ class Register extends React.Component {
       errorShow: false,
       error: '',
       loading: false,
-      cooldown: cooldown
-    }
-  }
-  
-  componentWillReceiveProps(props) {
-    if (props.data.cooldown !== this.state.color) {
-      this.setState({
-        cooldown: props.data.cooldown
-      })
+      target: props.data.target,
+      sellPrice: props.data.price,
+      onsale: (this.props.data.price > 0)
     }
   }
 
-  caculateTimestamp() {
-    let timestamp;
-    if (this.props.data.cooldown === 0) {
-      timestamp = moment();
-    } else {
-      timestamp = moment.unix(this.props.data.cooldown);
-    }
-    return timestamp.toString()
+  sellPriceChange(e) {
+    this.setState({
+      sellPrice: e.target.value
+    });
   }
 
-  countDown() {
-    let cooldown;
-    const timestamp = moment.unix(this.props.data.cooldown);
-    cooldown = Math.floor(timestamp.diff(moment().valueOf()) / 1000);
-    if (cooldown < 0) {
-      cooldown = 0;
+  sell() {
+    this.props.onSell(this.props.data.input, this.state.sellPrice);
+  }
+
+  targetChange(e) {
+    this.setState({
+      target: e.target.value
+    });
+  }
+
+  setTarget() {
+    if (!Utils.tronWeb.isAddress(this.state.target)) {
+      return;
     }
-    const hours = _.padStart(Math.floor(cooldown % (60 * 60 * 24) / (60 * 60), 2, '0'));
-    const minutes = _.padStart(Math.floor(cooldown % (60 * 60 ) / 60), 2, '0');
-    const seconds = _.padStart(Math.floor(cooldown % 60 ), 2, '0');
-    return `${hours} hours ${minutes} minutes ${seconds} seconds`;
+    this.props.onChangeTarget(this.props.data.input, this.state.target);
   }
 
   back() {
@@ -171,7 +149,13 @@ class Register extends React.Component {
 
   messageBlock() {
     let block;
-    if (this.props.data.address && this.props.data.owner === this.props.data.address) {
+    if (this.props.data.price > 0) {
+      block = <div className="message owner">
+                <img src={owner} alt="owner" />
+                {this.props.data.input}.trx is on sale.
+              </div>
+    }
+    else if (this.props.data.address && this.props.data.owner === this.props.data.address) {
       block = <div className="message owner">
                   <img src={owner} alt="owner" />
                   You are the {this.props.data.input}.trx owner.
@@ -192,83 +176,78 @@ class Register extends React.Component {
     return block;
   }
 
-  walletBlock() {
-    let block;
-    if (this.props.data.address && this.props.data.owner === this.props.data.address) {
-      block = <div></div>
-    } else if (this.props.data.address) {
-      block = <div className="wallet">
-                <img src={wallet} alt="wallet" />
-                <div className="text">
-                  <div className="row">
-                    <div className="col-4">
-                      Account Address:
-                    </div>
-                    <div className="col-8">
-                      {this.props.data.address}
-                    </div>
-                    <div className="col-4">
-                      Account Balance:
-                    </div>
-                    <div className="col-8">
-                      {this.props.data.balance} TRX
-                    </div>
-                    <div className="col-4">
-                      Pending Withdraw:
-                    </div>
-                    <div className="col-8">
-                      {this.props.data.pendingWithdraw} TRX
-                      <i className="fas fa-share" title="withdraw" onClick={this.withdraw}></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-    } else {
-      block = <div></div>
-    }
-    return block;
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
   render() {
-    
     const message = this.messageBlock();
-    const wallet = this.walletBlock();
     const bidPrice = this.props.data.owner ? (this.props.data.price * 1.3).toFixed(6) : this.props.data.price;
   
     return (
       <div className="register">
         {message}
-        {wallet}
-        <div className="cooldown">
-          <div className="title"><i className="far fa-clock"></i>You Can Buy It Until</div>
-          <div className="fix-time">{this.caculateTimestamp()}</div>
-          <div className="down-time">{this.countDown()}</div>
-        </div>
         <div className="form row">
           <div className="col-4">Name: </div>
           <div className="col-8 text-right">{this.props.data.input}.trx</div>
           <div className="col-4">Owner: </div>
           <div className="col-8 text-right">{this.props.data.owner}</div>
-          <div className="col-4">Current Price: </div>
-          <div className="col-8 text-right">{this.props.data.price} TRX</div>
-          <div className="col-4">Bid Price: </div>
-          <div className="col-8 text-right">{bidPrice} TRX</div>
+          <div className="col-4">Target: </div>
+          <div className="col-8 text-right">{this.props.data.target}</div>
+          <div className="col-4">Expired: </div>
+          <div className="col-8 text-right">{moment(this.props.data.expired * 1000).format('YYYY-MM-DD HH:mm:ss a')}</div>
+        </div>
+        <div className={classNames({
+          'target-block': true,
+          'd-none': this.state.onsale
+          })}>
+          <div className="text">Target Address:</div>
+          <div className="input-group"><input className="form-control target" value={this.state.target} onChange={this.targetChange} /></div>
+          <div className="button change-target" disabled={!Utils.tronWeb.isAddress(this.state.target)} onClick={this.setTarget}>Change Target</div>
+        </div>
+        <div className={classNames({
+          'buytime-block': true,
+          'd-none': this.state.onsale
+          })}>
+          <div className="buytime-card">
+            <div>Expired Date</div>
+            <div className="title">1 Day</div>
+            <div className="text">Until: </div>
+            <div className="text">Price: <span>1 TRX</span></div>
+            <div className="button buy">Buy</div>
+          </div>
+          <div className="buytime-card">
+            <div>Expired Date</div>
+            <div className="title">1 Month</div>
+            <div className="text">Until: </div>
+            <div className="text">Price: <span>30 TRX</span></div>
+            <div className="button buy">Buy</div>
+          </div>
+          <div className="buytime-card">
+            <div>Expired Date</div>
+            <div className="title">1 Year</div>
+            <div className="text">Until: </div>
+            <div className="text">Price: <span>360 TRX</span></div>
+            <div className="button buy">Buy</div>
+          </div>
+        </div>
+        <div className="sell-block">
+          <div className="text">Sell Price:</div>
+          <div className="input-group">
+            <input className="form-control target" type="number" value={this.state.sellPrice} onChange={this.sellPriceChange} />
+            <div className="input-group-append">
+              <span className="input-group-text" id="basic-addon2">TRX</span>
+            </div>
+          </div>
+          <div className="button sell" disabled={this.state.sellPrice <= 0} onClick={this.sell}>Sell</div>
         </div>
         <div className="buttons">
           <div className="button cancel" onClick={this.back}>
-            Change a name
+            Change name
           </div>
-          <div className={classNames({
+          {/* <div className={classNames({
                 button: true,
                 confirm: true,
                 'd-none': this.props.data.address && this.props.data.owner === this.props.data.address
                 })} disabled={this.state.cooldown > 0} onClick={this.openModal}>
             Buy It!
-          </div>
+          </div> */}
         </div>
         <NoWallet modalShow={this.state.modalShowNoWallet} onCloseModal={this.closeModal} />
         <Modal visible={this.state.modalShow} onClickBackdrop={this.closeModal} dialogClassName="modal-dialog-centered">

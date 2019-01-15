@@ -24,8 +24,7 @@ class App extends React.Component {
     owner: '',
     balance: 0,
     pendingWithdraw: 0,
-    price: 1,
-    cooldown: 0
+    price: 1
   }
 
   constructor(props) {
@@ -33,12 +32,14 @@ class App extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.checkAddress = this.checkAddress.bind(this);
+    this.setTarget = this.setTarget.bind(this);
     this.backToMain = this.backToMain.bind(this);
     this.withdraw = this.withdraw.bind(this);
+    this.sell = this.sell.bind(this);
   }
 
   async componentDidMount() {
-    const TRONGRID_API = 'https://api.trongrid.io/';
+    const TRONGRID_API = 'https://api.shasta.trongrid.io/';
     window.tronWebFondation = new TronWeb(
       TRONGRID_API,
       TRONGRID_API,
@@ -93,13 +94,6 @@ class App extends React.Component {
             balance: balance
           })
         }
-        let pendingWithdraw = await Utils.checkPendingWithdraw();
-        pendingWithdraw = Utils.tronWeb.fromSun(pendingWithdraw._hex);
-        if (this.state.pendingWithdraw !== pendingWithdraw) {
-          this.setState({
-            pendingWithdraw: pendingWithdraw
-          })
-        }
       }
     }, 1000);
   }
@@ -115,31 +109,43 @@ class App extends React.Component {
     await Utils.withdraw();
   }
 
+  async sell(name, price) {
+    await Utils.sell(name, Utils.tronWebFondation.toSun(price));
+    await this.checkAddress();
+  }
+
+  async setTarget(name, target) {
+    await Utils.setTarget(name, target);
+    await this.checkAddress();
+  }
+
   async checkAddress() {
     if (!this.state.input) {
       return
     }
     const input = this.state.input.toLowerCase();
     const result = await Utils.getRecord(input);
-    const cooldown = parseInt(result[2]._hex);
-    let addressUsed;
-    let owner;
-    let price;
+    let addressUsed, owner, target, expired, price;
+    console.log(result);
     if (result[0] === "410000000000000000000000000000000000000000") {
       addressUsed = false;
-      price = 1;
+      owner = '';
+      target = '';
     } else {
       addressUsed = true;
       owner = Utils.tronWebFondation.address.fromHex(result[0]);
-      price = Utils.tronWebFondation.fromSun(result[1]);
+      target = Utils.tronWebFondation.address.fromHex(result[1]);
     }
+    expired = parseInt(result[2]);
+    price = Utils.tronWebFondation.fromSun(result[3]);
     this.setState({
       addressUsed: addressUsed,
-      owner: owner,
       checked: true,
+      owner: owner,
+      target: target,
+      expired: expired,
       price: price,
-      input: input,
-      cooldown: cooldown
+      input: input
     })
   }
 
@@ -180,17 +186,17 @@ class App extends React.Component {
                 owner: this.state.owner,
                 address: this.state.account.base58,
                 balance: this.state.balance,
-                pendingWithdraw: this.state.pendingWithdraw,
+                target: this.state.target,
+                expired: this.state.expired,
                 price: this.state.price,
                 addressUsed: this.state.addressUsed,
-                loading: this.state.loading,
-                cooldown: this.state.cooldown
-              }} onCheckAddress={this.checkAddress} onBack={this.backToMain} onWithdraw={this.withdraw} />
+                loading: this.state.loading
+              }} onCheckAddress={this.checkAddress} onBack={this.backToMain} onChangeTarget={this.setTarget} onSell={this.sell} />
     }
 
     return (
       <div>
-        <Navbar address={this.state.account} balance={this.state.balance} pendingWithdraw={this.state.pendingWithdraw} onWithdraw={this.withdraw} />
+        <Navbar address={this.state.account} balance={this.state.balance} />
         <div className="container">
           {page}
         </div>
