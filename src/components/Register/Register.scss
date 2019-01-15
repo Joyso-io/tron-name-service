@@ -12,22 +12,31 @@ $yellow: #fff539;
         justify-content: center;
         align-items: center;
         border: 1px solid #000;
-        padding: 15px 30px;
-        margin-top: 20px;
+        padding: 15px 15px 15px 30px;
+        margin-top: -1px;
 
         .text {
             margin-right: 60px;
         }
 
         .input-group {
-            width: 350px;
+            width: 320px;
+            margin-right: 30px;
         }
 
         .sell {
             color: #fff;
             width: 120px;
             background-color: #dc3545;
-            margin: 0 0 0 30px;
+            margin: 0 0 0 10px;
+        }
+
+        .cancel {
+            margin: 0;
+        }
+
+        .buy {
+            width: 120px;
         }
     }
 
@@ -38,7 +47,6 @@ $yellow: #fff539;
         align-items: center;
         border: 1px solid #000;
         padding: 15px 30px;
-        margin-top: 30px;
 
         .text {
             margin-right: 60px;
@@ -57,7 +65,7 @@ $yellow: #fff539;
         display: flex;
         width: 800px;
         border: 1px solid #000;
-        border-top: none;
+        margin-top: -1px;
 
         .buytime-card {
             width: 33%;
@@ -72,6 +80,7 @@ $yellow: #fff539;
                 font-size: 24px;
                 margin: 15px 0;
                 position: relative;
+                z-index: 5;
             }
 
             .title::after {
@@ -151,10 +160,11 @@ $yellow: #fff539;
     }
 
     .form {
-        width: 700px;
+        width: 800px;
         background-color: #efefef;
         margin-top: 20px;
         padding: 17px 50px;
+        margin-bottom: 30px;
 
         .form-group {
             position: relative;

@@ -23,7 +23,6 @@ class App extends React.Component {
     addressUsed: false,
     owner: '',
     balance: 0,
-    pendingWithdraw: 0,
     price: 1
   }
 
@@ -36,6 +35,7 @@ class App extends React.Component {
     this.backToMain = this.backToMain.bind(this);
     this.withdraw = this.withdraw.bind(this);
     this.sell = this.sell.bind(this);
+    this.buy = this.buy.bind(this);
   }
 
   async componentDidMount() {
@@ -114,6 +114,11 @@ class App extends React.Component {
     await this.checkAddress();
   }
 
+  async buy(name, price) {
+    await Utils.buy(name, Utils.tronWebFondation.toSun(price));
+    await this.checkAddress();
+  }
+
   async setTarget(name, target) {
     await Utils.setTarget(name, target);
     await this.checkAddress();
@@ -127,17 +132,17 @@ class App extends React.Component {
     const result = await Utils.getRecord(input);
     let addressUsed, owner, target, expired, price;
     console.log(result);
-    if (result[0] === "410000000000000000000000000000000000000000") {
+    if (result[1] === "410000000000000000000000000000000000000000") {
       addressUsed = false;
       owner = '';
       target = '';
     } else {
       addressUsed = true;
-      owner = Utils.tronWebFondation.address.fromHex(result[0]);
-      target = Utils.tronWebFondation.address.fromHex(result[1]);
+      owner = Utils.tronWebFondation.address.fromHex(result[1]);
+      target = Utils.tronWebFondation.address.fromHex(result[2]);
     }
-    expired = parseInt(result[2]);
-    price = Utils.tronWebFondation.fromSun(result[3]);
+    expired = parseInt(result[3]);
+    price = Utils.tronWebFondation.fromSun(result[4]);
     this.setState({
       addressUsed: addressUsed,
       checked: true,
@@ -191,7 +196,7 @@ class App extends React.Component {
                 price: this.state.price,
                 addressUsed: this.state.addressUsed,
                 loading: this.state.loading
-              }} onCheckAddress={this.checkAddress} onBack={this.backToMain} onChangeTarget={this.setTarget} onSell={this.sell} />
+              }} onCheckAddress={this.checkAddress} onBack={this.backToMain} onChangeTarget={this.setTarget} onSell={this.sell} onBuy={this.buy} />
     }
 
     return (

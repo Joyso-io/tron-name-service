@@ -64,9 +64,10 @@ class Navbard extends React.Component {
                                 <DropdownMenu right>
                                     <div className="rule">
                                         <p>1. Check the name is owned or not.</p>
-                                        <p>2. If not, you can buy it with default price.</p>
-                                        <p>3. If owned, and not in cooldown time, you can buy it with 1.3x price.</p>
-                                        <p className="mb-0">4. If your name has been bought, the 1.3x price TRX will go into withdrawal, you can withdraw it.</p>
+                                        <p>2. If not, you can buy it with default price.(approximately 1 Day 1 TRX)</p>
+                                        <p>3. If owned, only owner can choose to sell it or wait it been expired.</p>
+                                        <p>4. If you are owner, you can extend expire time or sell the domain name.</p>
+                                        <p>5. Every domain name sell will charge 1% fee.</p>
                                     </div>
                                 </DropdownMenu>
                             </UncontrolledDropdown>
