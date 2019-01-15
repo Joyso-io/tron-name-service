@@ -1,4 +1,4 @@
-const contractAddress = 'TMf2gzpxpnePxv5ZKyxPQu2r2vkuVrk2kT';
+const contractAddress = 'TTRApcnfKNJ5Vn4sEpXCPsUAyLBUYQt81X';
 
 const utils = {
     tronWeb: false,
@@ -20,16 +20,33 @@ const utils = {
         return this.contractFoundation.getRecord(name).call();
     },
 
-    async setAddress(name) {
-        return this.contract.setAddress(name).send();
+    async register(name, target, value) {
+        return this.contract.register(name, target).send({
+            callValue: value
+        });
     },
 
-    async checkPendingWithdraw() {
-        return this.contract.checkPendingWithdraw().call();
+    async setTarget(name, target) {
+        return this.contract.setTarget(name, target).send();
+    },
+
+    async sell(name, price) {
+        return this.contract.sell(name, price).send();
+    },
+
+    async buy(name, price) {
+        return this.contract.buy(name).send({
+            callValue: price,
+            shouldshouldPollResponse: true
+        })
     },
 
     async withdraw() {
         return this.contract.withdraw().send();
+    },
+
+    async isOpen() {
+        return this.contract.open().call();
     }
 };
 

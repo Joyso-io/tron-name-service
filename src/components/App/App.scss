@@ -4,7 +4,7 @@ $black: #0b132b;
 $gray: #E7E7E7;
 
 .container {
-    margin-top: 70px;
+    margin-top: 40px;
 }
 
 .main {
@@ -92,12 +92,17 @@ $gray: #E7E7E7;
     cursor: pointer;
 }
 
-.button[disabled] {
-    cursor: no-drop;
-}
-
 .button:hover {
     filter: brightness(0.9);
+}
+
+.button[disabled] {
+    cursor: no-drop;
+    filter: brightness(0.7);
+}
+
+.button[disabled]:hover {
+    filter: brightness(0.7);
 }
 
 .check {
