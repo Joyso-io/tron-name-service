@@ -133,7 +133,7 @@ contract TronNameService is Ownable {
     function buy(string name) external payable onlyRecordOnSale(name) {
         uint256 price = records[name].price;
         require(msg.value >= price);
-        uint256 afterFee = price * fee / 10000;
+        uint256 afterFee = price * (10000 - fee) / 10000;
         records[name].owner.transfer(afterFee);
         if (msg.value > price) {
             msg.sender.transfer(msg.value - price);
