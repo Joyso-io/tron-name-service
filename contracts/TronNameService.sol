@@ -231,7 +231,7 @@ contract TronNameService is Ownable {
         user.transfer(amount);
     }
 
-    function removeOrder(string name, uint256 orderId, uint256 preId) internal {
+    function removeOrder(string memory name, uint256 orderId, uint256 preId) internal {
         if (preId == 0) {
             records[name].orderId = orders[orderId].nextId;
         } else {
@@ -248,7 +248,9 @@ contract TronNameService is Ownable {
     }
 
     function getRecord(string memory name) public view returns (uint96, address, address, uint96, uint256, uint256) {
-        return (records[name].id, records[name].owner, records[name].target, records[name].expiredAt, records[name].price, records[name].orderId);
+        return (
+            records[name].id, records[name].owner, records[name].target, records[name].expiredAt, records[name].price, records[name].orderId
+        );
     }
 
     function getRecordById(uint96 id) public view returns (uint96, address, address, uint96, uint256, uint256) {
@@ -263,9 +265,7 @@ contract TronNameService is Ownable {
         bytes memory chars = bytes(name);
         for (uint256 i = 0; i < chars.length; ++i) {
             // [0-9a-z] or -
-            bool valid = chars[i] >= 97 && chars[i] <= 122 ||
-                chars[i] >= 48 && chars[i] <= 57 ||
-                chars[i] == 45;
+            bool valid = chars[i] >= 97 && chars[i] <= 122 || chars[i] >= 48 && chars[i] <= 57 || chars[i] == 45;
             if (!valid) {
                 return false;
             }
