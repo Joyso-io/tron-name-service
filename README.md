@@ -5,9 +5,10 @@ Tron Name Service is a naming service that simpify long, complicated wallet addr
 ## How to Use
 
 1. Check the name is owned or not.
-2. If not, you can buy it with default price.
-3. If owned, and not in cooldown time, you can buy it with 1.3x price.
-4. If your name has been bought, the 1.3x price TRX will go into withdrawal, you can withdraw it.
+2. If not, you can buy it with default price.(approximately 1 Day 1 TRX)
+3. If owned, only owner can choose to sell it or wait it been expired.
+4. If you are owner, you can extend expire time or sell the domain name.
+5. Every domain name sell will charge 1% fee.
 
 ## Contract Address
 

@@ -4,6 +4,8 @@ module.exports = function(deployer) {
   deployer.deploy(TronNameService)
     .then(() => TronNameService.deployed())
     .then(tns => {
-      tns.addToAdmin(process.env.ADMIN, true);
+      if (process.env.ADMIN) {
+        tns.addToAdmin(process.env.ADMIN, true);
+      }
     });
 };
