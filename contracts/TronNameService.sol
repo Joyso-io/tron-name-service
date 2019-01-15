@@ -163,9 +163,8 @@ contract TronNameService is Ownable {
     function verifyName(string memory name) public pure returns (bool) {
         bytes memory chars = bytes(name);
         for (uint256 i = 0; i < chars.length; ++i) {
-            // [0-9a-zA-Z] or -
-            bool valid = chars[i] >= 65 && chars[i] <= 90 ||
-                chars[i] >= 97 && chars[i] <= 122 ||
+            // [0-9a-z] or -
+            bool valid = chars[i] >= 97 && chars[i] <= 122 ||
                 chars[i] >= 48 && chars[i] <= 57 ||
                 chars[i] == 45;
             if (!valid) {
