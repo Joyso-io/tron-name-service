@@ -23,7 +23,6 @@ class App extends React.Component {
     addressUsed: false,
     owner: '',
     balance: 0,
-    pendingWithdraw: 0,
     price: 1
   }
 
@@ -127,17 +126,17 @@ class App extends React.Component {
     const result = await Utils.getRecord(input);
     let addressUsed, owner, target, expired, price;
     console.log(result);
-    if (result[0] === "410000000000000000000000000000000000000000") {
+    if (result[1] === "410000000000000000000000000000000000000000") {
       addressUsed = false;
       owner = '';
       target = '';
     } else {
       addressUsed = true;
-      owner = Utils.tronWebFondation.address.fromHex(result[0]);
-      target = Utils.tronWebFondation.address.fromHex(result[1]);
+      owner = Utils.tronWebFondation.address.fromHex(result[1]);
+      target = Utils.tronWebFondation.address.fromHex(result[2]);
     }
-    expired = parseInt(result[2]);
-    price = Utils.tronWebFondation.fromSun(result[3]);
+    expired = parseInt(result[3]);
+    price = Utils.tronWebFondation.fromSun(result[4]);
     this.setState({
       addressUsed: addressUsed,
       checked: true,
