@@ -40,11 +40,11 @@ class App extends React.Component {
 
   async componentDidMount() {
     let TRONGRID_API;
-    if (process.env.NODE_ENV === 'development') {
-      TRONGRID_API = 'https://api.shasta.trongrid.io/';
-    } else {
+    // if (process.env.NODE_ENV === 'production') {
       TRONGRID_API = 'https://api.trongrid.io/';
-    }
+    // } else {
+    //   TRONGRID_API = 'https://api.shasta.trongrid.io/';
+    // }
     window.tronWebFondation = new TronWeb(
       TRONGRID_API,
       TRONGRID_API,

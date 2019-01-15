@@ -1,4 +1,9 @@
-const contractAddress = 'TTRApcnfKNJ5Vn4sEpXCPsUAyLBUYQt81X';
+let contractAddress;
+// if (process.env.NODE_ENV === 'production') {
+    contractAddress = 'TTQg1UwfKZpNRm4v8C2zBNf5715d5KSn5G';
+// } else {
+//     contractAddress = 'TTRApcnfKNJ5Vn4sEpXCPsUAyLBUYQt81X';
+// }
 
 const utils = {
     tronWeb: false,
