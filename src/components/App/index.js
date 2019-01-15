@@ -35,6 +35,7 @@ class App extends React.Component {
     this.backToMain = this.backToMain.bind(this);
     this.withdraw = this.withdraw.bind(this);
     this.sell = this.sell.bind(this);
+    this.buy = this.buy.bind(this);
   }
 
   async componentDidMount() {
@@ -110,6 +111,11 @@ class App extends React.Component {
 
   async sell(name, price) {
     await Utils.sell(name, Utils.tronWebFondation.toSun(price));
+    await this.checkAddress();
+  }
+
+  async buy(name, price) {
+    await Utils.buy(name, Utils.tronWebFondation.toSun(price));
     await this.checkAddress();
   }
 
@@ -190,7 +196,7 @@ class App extends React.Component {
                 price: this.state.price,
                 addressUsed: this.state.addressUsed,
                 loading: this.state.loading
-              }} onCheckAddress={this.checkAddress} onBack={this.backToMain} onChangeTarget={this.setTarget} onSell={this.sell} />
+              }} onCheckAddress={this.checkAddress} onBack={this.backToMain} onChangeTarget={this.setTarget} onSell={this.sell} onBuy={this.buy} />
     }
 
     return (

@@ -34,6 +34,13 @@ const utils = {
         return this.contract.sell(name, price).send();
     },
 
+    async buy(name, price) {
+        return this.contract.buy(name).send({
+            callValue: price,
+            shouldshouldPollResponse: true
+        })
+    },
+
     async withdraw() {
         return this.contract.withdraw().send();
     }
