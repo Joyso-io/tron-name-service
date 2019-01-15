@@ -34,6 +34,7 @@ class Register extends React.Component {
     this.register = this.register.bind(this);
     this.untilDate = this.untilDate.bind(this);
     this.buy = this.buy.bind(this);
+    this.status = this.status.bind(this);
 
     this.state = {
       modalShow: false,
@@ -46,6 +47,18 @@ class Register extends React.Component {
       sellPrice: props.data.price,
       buyValue: 0
     }
+  }
+
+  status() {
+    let status;
+    if (this.props.data.price > 0) {
+      status = `On Sale (Price: ${this.props.data.price} TRX)`;
+    } else if (this.props.data.owner !== '' && moment().unix() < this.props.data.expired) {
+      status = `Owned`;
+    } else {
+      status = `Open`;
+    }
+    return status;
   }
 
   untilDate(value) {
@@ -217,6 +230,7 @@ class Register extends React.Component {
     const buttonString = (this.props.data.owner === this.props.data.address && moment().unix() <= this.props.data.expire) ? 'Extend': 'Buy';
     const expiredString = this.expiredDate();
     const sellString = (this.props.data.price > 0) ? 'Change Price' : 'Sell';
+    const statusString = this.status();
   
     return (
       <div className="register">
@@ -230,10 +244,12 @@ class Register extends React.Component {
           <div className="col-8 text-right">{this.props.data.target}</div>
           <div className="col-4">Expired: </div>
           <div className="col-8 text-right">{expiredString}</div>
+          <div className="col-4">Status: </div>
+          <div className="col-8 text-right">{statusString}</div>
         </div>
         <div className={classNames({
           'target-block': true,
-          'd-none': this.props.data.price > 0 || (this.props.data.owner !== '' && this.props.data.address !== this.props.data.owner)
+          'd-none': (this.props.data.owner !== '' && this.props.data.address !== this.props.data.owner)
           })}>
           <div className="text">Target Address:</div>
           <div className="input-group"><input className="form-control target" value={this.state.target} onChange={this.targetChange} /></div>
@@ -245,7 +261,7 @@ class Register extends React.Component {
         </div>
         <div className={classNames({
           'buytime-block': true,
-          'd-none': this.props.data.price > 0 || (this.props.data.owner !== '' && this.props.data.address !== this.props.data.owner)
+          'd-none': (this.props.data.owner !== '' && this.props.data.address !== this.props.data.owner)
           })}>
           <div className="buytime-card">
             <div>Expired Date</div>
@@ -274,8 +290,18 @@ class Register extends React.Component {
           'd-none': this.props.data.owner === '' || (this.props.data.owner !== this.props.data.address && this.props.data.price <= 0)
           })}>
           <div className="text">Sell Price:</div>
-          <div className="input-group">
-            <input className="form-control target" type="number" value={this.state.sellPrice} onChange={this.sellPriceChange} readOnly={this.props.data.owner !== this.props.data.address} />
+          <div className={classNames({
+            'input-group': true,
+            'justify-content-center': true,
+            'd-none': this.props.data.price <= 0 || this.props.data.owner === this.props.data.address
+            })}>
+            {this.state.sellPrice} TRX
+          </div>
+          <div className={classNames({
+              'input-group': true,
+              'd-none': this.props.data.price > 0 && this.props.data.owner !== this.props.data.address
+            })}>
+            <input className="form-control target" type="number" value={this.state.sellPrice} onChange={this.sellPriceChange} />
             <div className="input-group-append">
               <span className="input-group-text" id="basic-addon2">TRX</span>
             </div>
