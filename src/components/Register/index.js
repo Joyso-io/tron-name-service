@@ -245,7 +245,11 @@ class Register extends React.Component {
           <div className="col-4">Expired: </div>
           <div className="col-8 text-right">{expiredString}</div>
           <div className="col-4">Status: </div>
-          <div className="col-8 text-right">{statusString}</div>
+          <div className="col-8 text-right"><span className={classNames({
+            'text-danger': (statusString.includes('Sale')),
+            'text-success': (statusString === 'Open'),
+            'text-info': (statusString === 'Owned')
+            })}>{statusString}</span></div>
         </div>
         <div className={classNames({
           'target-block': true,
