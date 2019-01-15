@@ -130,8 +130,8 @@ class App extends React.Component {
     }
     const input = this.state.input.toLowerCase();
     const result = await Utils.getRecord(input);
+    const isOpen = await Utils.isOpen()
     let addressUsed, owner, target, expired, price;
-
     if (result[1] === "410000000000000000000000000000000000000000") {
       addressUsed = false;
       owner = '';
@@ -150,7 +150,8 @@ class App extends React.Component {
       target: target,
       expired: expired,
       price: price,
-      input: input
+      input: input,
+      isOpen: isOpen
     })
   }
 
@@ -195,7 +196,8 @@ class App extends React.Component {
                 expired: this.state.expired,
                 price: this.state.price,
                 addressUsed: this.state.addressUsed,
-                loading: this.state.loading
+                loading: this.state.loading,
+                isOpen: this.state.isOpen
               }} onCheckAddress={this.checkAddress} onBack={this.backToMain} onChangeTarget={this.setTarget} onSell={this.sell} onBuy={this.buy} />
     }
 

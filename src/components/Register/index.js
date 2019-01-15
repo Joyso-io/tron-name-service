@@ -306,7 +306,15 @@ class Register extends React.Component {
           <div className="modal-container">
             <div className="modal-title">You are buying a tron name</div>
             <img src={buy} alt="buy" />
-            <div className="row data">
+            <div className={classNames({
+                'data': true,
+                'd-none': this.props.data.isOpen
+                })}>The system isn't public open, please contact admin.</div>
+            <div className={classNames({
+                'row': true,
+                'data': true,
+                'd-none': !this.props.data.isOpen
+                })}>
               <div className="col-4">Name</div>
               <div className="col-8">{this.props.data.input}.trx</div>
               <div className="col-4">Owner</div>
@@ -318,7 +326,10 @@ class Register extends React.Component {
               <div className="col-4">Expired</div>
               <div className="col-8">{this.untilDate(this.state.buyValue).format('YYYY-MM-DD hh:mm:ss A')}</div>
             </div>
-            <div className="buttons">
+            <div className={classNames({
+                'buttons': true,
+                'd-none': !this.props.data.isOpen
+                })}>
               <div className="button cancel" disabled={this.state.loading} onClick={this.closeModal}>
                 Cancel
               </div>
