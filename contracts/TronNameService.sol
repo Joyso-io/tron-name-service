@@ -9,14 +9,25 @@ contract TronNameService is Ownable {
         address target;
         uint96 expiredAt;
         uint256 price;
+        uint256 orderId;
+    }
+
+    struct Order {
+        address buyer;
+        uint256 price;
+        uint256 nextId;
     }
 
     address public payoutAddress;
     uint96 public count;
     bool public open = false;
+    bool public offerEnabled = false;
     uint256 public sunPerMinute = 694; // 694 sun for 1 minute
     uint256 public fee = 100; // 1%
+    uint256 public orderCount;
+    uint256 public orderBalance;
     mapping (address => bool) public isAdmin;
+    mapping (uint256 => Order) public orders;
     mapping (string => Record) private records;
     mapping (uint96 => string) private idToNames;
 
@@ -48,6 +59,21 @@ contract TronNameService is Ownable {
         _;
     }
 
+    modifier onlyOrderOwner(uint256 orderId) {
+        require(orders[orderId].buyer == msg.sender);
+        _;
+    }
+
+    modifier onlyOrderExists(uint256 orderId) {
+        require(orders[orderId].price > 0);
+        _;
+    }
+
+    modifier onlyOfferEnabled() {
+        require(offerEnabled);
+        _;
+    }
+
     modifier enoughToPay() {
         require(msg.value > sunPerMinute);
         _;
@@ -73,12 +99,16 @@ contract TronNameService is Ownable {
         fee = newFee;
     }
 
+    function setOfferEnabled(bool newOfferEnabled) external onlyAdmin {
+        offerEnabled = newOfferEnabled;
+    }
+
     function start() external onlyAdmin {
         open = true;
     }
 
     function withdraw() external onlyAdmin {
-        payoutAddress.transfer(address(this).balance);
+        payoutAddress.transfer(address(this).balance - orderBalance);
     }
 
     function setRecord(string name, address owner, address target, uint96 expiredAt) external onlyAdmin {
@@ -133,26 +163,95 @@ contract TronNameService is Ownable {
     function buy(string name) external payable onlyRecordOnSale(name) {
         uint256 price = records[name].price;
         require(msg.value >= price);
-        uint256 afterFee = price * (10000 - fee) / 10000;
-        records[name].owner.transfer(afterFee);
-        if (msg.value > price) {
-            msg.sender.transfer(msg.value - price);
-        }
+        address user = records[name].owner;
+        uint256 amount = price * (10000 - fee) / 10000;
         emit Trade(records[name].id, records[name].owner, msg.sender, price);
         records[name].owner = msg.sender;
         records[name].price = 0;
         emit RecordUpdate(records[name].id, records[name].owner, records[name].target, records[name].expiredAt, records[name].price);
+        user.transfer(amount);
+        if (msg.value > price) {
+            msg.sender.transfer(msg.value - price);
+        }
+    }
+
+    function offer(string name) external payable onlyOfferEnabled {
+        require(!expired(name));
+        require(msg.value > 0);
+        uint256 orderId = ++orderCount;
+        Order memory order = Order(msg.sender, msg.value, 0);
+        if (records[name].orderId == 0) {
+            records[name].orderId = orderId;
+        } else {
+            uint256 worseOrderId = records[name].orderId;
+            uint256 betterOrderId;
+            while (orders[worseOrderId].price >= msg.value) {
+                betterOrderId = worseOrderId;
+                if (orders[worseOrderId].nextId == 0) {
+                    worseOrderId = 0;
+                    break;
+                } else {
+                    worseOrderId = orders[worseOrderId].nextId;
+                }
+            }
+            if (worseOrderId != 0) {
+                order.nextId = worseOrderId;
+            }
+            if (betterOrderId == 0) {
+                records[name].orderId = orderId;
+            } else {
+                orders[betterOrderId].nextId = orderId;
+            }
+        }
+        orders[orderId] = order;
+        orderBalance += msg.value;
+    }
+
+    function accept(string name, uint256 orderId) external onlyOfferEnabled onlyRecordOwner(name) onlyOrderExists(orderId) {
+        bool result;
+        uint256 preId;
+        (result, preId) = searchOrder(name, orderId);
+        require(result);
+        address user = records[name].owner;
+        records[name].owner = orders[orderId].buyer;
+        records[name].price = 0;
+        uint256 amount = orders[orderId].price * (10000 - fee) / 10000;
+        removeOrder(name, orderId, preId);
+        user.transfer(amount);
+    }
+
+    function cancelOffer(string name, uint256 orderId) external onlyOrderOwner(orderId) onlyOrderExists(orderId) {
+        bool result;
+        uint256 preId;
+        (result, preId) = searchOrder(name, orderId);
+        require(result);
+        address user = orders[orderId].buyer;
+        uint256 amount = orders[orderId].price;
+        removeOrder(name, orderId, preId);
+        user.transfer(amount);
+    }
+
+    function removeOrder(string name, uint256 orderId, uint256 preId) internal {
+        if (preId == 0) {
+            records[name].orderId = orders[orderId].nextId;
+        } else {
+            orders[preId].nextId = orders[orderId].nextId;
+        }
+        orderBalance -= orders[orderId].price;
+        orders[orderId].buyer = 0;
+        orders[orderId].price = 0;
+        orders[orderId].nextId = 0;
     }
 
     function expired(string memory name) public view returns (bool) {
         return records[name].owner == address(0) || now > records[name].expiredAt;
     }
 
-    function getRecord(string memory name) public view returns (uint96, address, address, uint96, uint256) {
-        return (records[name].id, records[name].owner, records[name].target, records[name].expiredAt, records[name].price);
+    function getRecord(string memory name) public view returns (uint96, address, address, uint96, uint256, uint256) {
+        return (records[name].id, records[name].owner, records[name].target, records[name].expiredAt, records[name].price, records[name].orderId);
     }
 
-    function getRecordById(uint96 id) public view returns (uint96, address, address, uint96, uint256) {
+    function getRecordById(uint96 id) public view returns (uint96, address, address, uint96, uint256, uint256) {
         return getRecord(idToNames[id]);
     }
 
@@ -172,5 +271,18 @@ contract TronNameService is Ownable {
             }
         }
         return true;
+    }
+
+    function searchOrder(string memory name, uint256 orderId) public view returns (bool, uint256) {
+        uint256 preId = 0;
+        uint256 nextId = records[name].orderId;
+        while (nextId != orderId) {
+            if (nextId == 0) {
+                return (false, preId);
+            }
+            preId = nextId;
+            nextId = orders[nextId].nextId;
+        }
+        return (true, preId);
     }
 }
