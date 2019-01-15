@@ -40,7 +40,7 @@ class App extends React.Component {
 
   async componentDidMount() {
     let TRONGRID_API;
-    if (process.env.NODE_ENV == 'development') {
+    if (process.env.NODE_ENV === 'development') {
       TRONGRID_API = 'https://api.shasta.trongrid.io/';
     } else {
       TRONGRID_API = 'https://api.trongrid.io/';

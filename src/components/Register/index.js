@@ -309,7 +309,7 @@ class Register extends React.Component {
             <div className={classNames({
                 'data': true,
                 'd-none': this.props.data.isOpen
-                })}>The service is on promotion period, you cannot buy names on the mainnet currently. Company who wants to customize a name can email <a target="_blank" href="mailto:biz@joyso.i">biz@joyso.io</a> to get free trial.<br/><br/>
+                })}>The service is on promotion period, you cannot buy names on the mainnet currently. Company who wants to customize a name can email <a target="_blank" href="mailto:biz@joyso.i" rel="noopener noreferrer">biz@joyso.io</a> to get free trial.<br/><br/>
                 The service is expected to open on 1st March. Buy names through the service will be available for everyone then.</div>
             <div className={classNames({
                 'row': true,
